@@ -10,6 +10,10 @@ addons:
       - g++-8
 
 before_script:
+- echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get update -qq
+- sudo apt-get install libboost-all-dev -y
+
 - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
 - tar xf release-1.8.0.tar.gz
 - cd googletest-release-1.8.0
