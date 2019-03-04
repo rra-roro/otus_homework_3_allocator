@@ -1,5 +1,5 @@
 # whitelist
 branches:
   only:
-    - master
-    - review1
+  - review1  
+  - master
