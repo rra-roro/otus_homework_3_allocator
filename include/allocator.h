@@ -77,7 +77,7 @@ class memory_chunk
 template <typename T, size_t initial_reservation = 1, size_t next_reservation = 1>
 struct custom_allocator
 {
-      using value_type = typename T;
+      using value_type = T;
 
       custom_allocator() noexcept
       {
@@ -182,7 +182,7 @@ struct custom_allocator
       size_t* m_ref_next_reserve_size = &m_next_reserve_size;
 };
 
-template <typename T, size_t reserve_tt, class U, typename reserve_tu>
+template <typename T, size_t reserve_tt, typename U, size_t reserve_tu>
 constexpr bool operator==(const custom_allocator<T, reserve_tt>&, const custom_allocator<U, reserve_tu>&) noexcept
 {
       return true;
