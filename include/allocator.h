@@ -169,7 +169,7 @@ struct custom_allocator
             m_next_reserve_size = count;
       }
 
-      template <typename U, size_t initial_reservation, size_t next_reservation>
+      template <typename U, size_t initial_reservation_, size_t next_reservation_>
       friend struct custom_allocator;
 
   private:
