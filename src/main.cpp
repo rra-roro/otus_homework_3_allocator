@@ -65,6 +65,11 @@ int main(int argc, char* argv[])
             default_allocator_map[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
       }
 
+      map<int, mpz_int, less<int>, custom_allocator<pair<const int, mpz_int>,10,10>> custom_allocator_map;
+      for (int i = 0; i < 10; i++)
+      {
+            custom_allocator_map[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
+      }
 
       return 0;
 }

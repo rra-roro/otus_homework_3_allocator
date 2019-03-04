@@ -90,13 +90,13 @@ struct custom_allocator
       }
 
 
-      template <typename U, size_t initial_reservation, size_t next_reservation>
-      custom_allocator(const custom_allocator<U, initial_reservation, next_reservation>& arg_alloc) noexcept : m_init_reserve_size(1), m_ref_next_reserve_size(&m_next_reserve_size_dummy)
+      template <typename U, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
+      custom_allocator(const custom_allocator<U, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_init_reserve_size(1), m_ref_next_reserve_size(&m_next_reserve_size_dummy)
       {
       }
 
-      template <typename T1, typename T2, size_t initial_reservation, size_t next_reservation>
-      custom_allocator(const custom_allocator<std::pair<T1, T2>, initial_reservation, next_reservation>& arg_alloc) noexcept : m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
+      template <typename T1, typename T2, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
+      custom_allocator(const custom_allocator<std::pair<T1, T2>, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
       }
 
@@ -134,7 +134,7 @@ struct custom_allocator
             {
                   return static_cast<T*>(malloc(n * sizeof(T)));
             }
-            else if (!chunks->back().is_free_memory())
+            else //if (!chunks->back().is_free_memory())
             {
                   size_t size_chunk = std::max(n, *m_ref_next_reserve_size);
                   chunks->emplace_back(size_chunk);
