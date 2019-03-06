@@ -89,12 +89,19 @@ struct custom_allocator
             static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
       }
 
-
+	/*
+	  конструктор копирования для custom_allocator<_Container_proxy,5,1>
+	  Поскольку _Container_proxy * custom_allocator<_Container_proxy,5,1>::allocate(unsigned __int64) вызывается один раз, 
+	  то мы не будем выделять под _Container_proxy больше, чем запрашивается при вызове allocate, для этих целей в конструкторе копирования мы задаем m_init_reserve_size(1)
+	*/
       template <typename U, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
       custom_allocator(const custom_allocator<U, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_init_reserve_size(1), m_ref_next_reserve_size(&m_next_reserve_size_dummy)
       {
       }
 
+	/*
+	  обычный конструктор копирования для custom_allocator<_Tree_node<pair<int const ,int>,void *>,5,1>
+	*/
       template <typename T1, typename T2, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
       custom_allocator(const custom_allocator<std::pair<T1, T2>, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
