@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
             from_chars(ptrStr, ptrStr + SizeParam, max_item);
       }
 
-      map<int, mpz_int> map_default_allocator;
+      /*map<int, mpz_int> map_default_allocator;
       for (int i = 0; i < max_item; i++)
       {
             map_default_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
@@ -81,21 +81,21 @@ int main(int argc, char* argv[])
       for (auto& item : map_my_allocator)
       {
             cout << item.first << " " << item.second << "\n";
-      }
+      }*/
 
-      custom_forward_list<int> my_list_default_allocator;
+      custom_forward_list<int> list_default_allocator;
       for (int i = 0; i < max_item; ++i)
       {
-            my_list_default_allocator.push_front(i);
+            list_default_allocator.push_front(i);
       }
 
-      custom_forward_list<int, custom_allocator<int, 10>> my_list_custom_allocator;
+      custom_forward_list<int, custom_allocator<int, 10>> list_my_allocator;
       for (int i = 0; i < max_item; ++i)
       {
-            my_list_custom_allocator.push_front(i);
+            list_my_allocator.push_front(i);
       }
 
-      for (auto& obj : my_list_custom_allocator)
+      for (auto& obj : list_my_allocator)
       {
             cout << obj << " ";
       }
