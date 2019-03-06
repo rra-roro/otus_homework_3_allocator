@@ -13,8 +13,7 @@ using namespace std;
 void help()
 {
       cout << R"(
- This tool gets ip_filter.tsv from stdin. It extracts IPs from them,
- then it sortes and filters IPs. The result will be sent to stdout
+ This demo is my custom allocator.
 
     allocator  [-version | -? | -max_item <size> ]
        Options:  
@@ -26,7 +25,7 @@ void help()
 
 void version_ip_filter()
 {
-      cout << "Version ip_filter: " << version() << endl;
+      cout << "Version allocator: " << version() << endl;
 }
 
 

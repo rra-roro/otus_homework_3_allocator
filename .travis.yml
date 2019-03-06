@@ -36,5 +36,5 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-  - curl -T ip_filter-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -urra-roro:$BINTRAY_API_KEY "https://api.bintray.com/content/rra-roro/otus_homework/ip_filter/$TRAVIS_BUILD_NUMBER/ip_filter-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+  - curl -T allocator-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -urra-roro:$BINTRAY_API_KEY "https://api.bintray.com/content/rra-roro/otus_homework/allocator/$TRAVIS_BUILD_NUMBER/allocator-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
   
