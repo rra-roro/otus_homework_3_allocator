@@ -28,6 +28,16 @@ void version_ip_filter()
       cout << "Version allocator: " << version() << endl;
 }
 
+int my_factorial(int i)
+{
+      int ret = 1;
+      for (int j = 0; j < i; j++)
+      {
+            ret *= j;
+      }
+
+      return ret;
+}
 
 using namespace boost::multiprecision;
 using namespace boost::math;
@@ -66,23 +76,40 @@ int main(int argc, char* argv[])
             from_chars(ptrStr, ptrStr + SizeParam, max_item);
       }
 
-      map<int, mpz_int> map_default_allocator;
-      for (int i = 0; i < max_item; i++)
+      if (PCL.Option['m'])
       {
-         //   map_default_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
-            map_default_allocator[i] = static_cast<mpz_int>(i);
-      }
+            map<int, mpz_int> map_default_allocator;
+            for (int i = 0; i < max_item; i++)
+            {
+                  //   map_default_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
+                  map_default_allocator[i] = static_cast<mpz_int>(i);
+            }
 
-      map<int, mpz_int, less<int>, custom_allocator<pair<const int, mpz_int>, 10>> map_my_allocator;
-      for (int i = 0; i < max_item; i++)
-      {
-         //   map_my_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
-            map_default_allocator[i] = static_cast<mpz_int>(i);
+            map<int, mpz_int, less<mpz_int>, custom_allocator<pair<const int, mpz_int>, 10>> map_my_allocator;
+            for (int i = 0; i < max_item; i++)
+            {
+                  //   map_my_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
+                  map_my_allocator[i] = static_cast<mpz_int>(i);
+            }
       }
-
-      for (auto& item : map_my_allocator)
+      else
       {
-            cout << item.first << " " << item.second << "\n";
+            map<int, int> map_default_allocator;
+            for (int i = 0; i < max_item; i++)
+            {
+                  map_default_allocator[i] = my_factorial(i);
+            }
+
+            map<int, int, less<int>, custom_allocator<pair<const int, int>, 10>> map_my_allocator;
+            for (int i = 0; i < max_item; i++)
+            {
+                  map_my_allocator[i] = my_factorial(i);
+            }
+
+            for (auto& item : map_my_allocator)
+            {
+                  cout << item.first << " " << item.second << "\n";
+            }
       }
 
       custom_forward_list<int> list_default_allocator;
