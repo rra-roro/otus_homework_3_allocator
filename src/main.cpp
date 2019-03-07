@@ -68,6 +68,7 @@ void task_custom_forward_list(int max_item)
       {
             cout << obj << " ";
       }
+      cout << "\n";
 }
 
 
