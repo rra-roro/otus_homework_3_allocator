@@ -81,15 +81,18 @@ int main(int argc, char* argv[])
             map<int, mpz_int> map_default_allocator;
             for (int i = 0; i < max_item; i++)
             {
-                  //   map_default_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
-                  map_default_allocator[i] = static_cast<mpz_int>(i);
+                  map_default_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
             }
 
             map<int, mpz_int, less<mpz_int>, custom_allocator<pair<const int, mpz_int>, 10>> map_my_allocator;
             for (int i = 0; i < max_item; i++)
             {
-                  //   map_my_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
-                  map_my_allocator[i] = static_cast<mpz_int>(i);
+                  map_my_allocator[i] = static_cast<mpz_int>(factorial<mpf_float_100>(i));
+            }
+
+            for (auto& item : map_my_allocator)
+            {
+                  cout << item.first << " " << item.second << "\n";
             }
       }
       else
