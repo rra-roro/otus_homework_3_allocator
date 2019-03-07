@@ -6,7 +6,7 @@
 int my_factorial(int i)
 {
       int ret = 1;
-      for (int j = 0; j < i; j++)
+      for (int j = 1; j <= i; j++)
       {
             ret *= j;
       }
