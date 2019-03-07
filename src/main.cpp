@@ -37,7 +37,7 @@ using namespace boost::math;
 int main(int argc, char* argv[])
 {
       int max_item = 10;
-
+/*
       ParserCommandLine PCL;
       PCL.AddFormatOfArg("?", no_argument, '?');
       PCL.AddFormatOfArg("help", no_argument, '?');
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
             const char* const ptrStr = PCL.Option['m'].ParamOption[0].data();
             from_chars(ptrStr, ptrStr + SizeParam, max_item);
       }
-
+*/
       /*map<int, mpz_int> map_default_allocator;
       for (int i = 0; i < max_item; i++)
       {
