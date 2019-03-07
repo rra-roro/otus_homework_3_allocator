@@ -2,15 +2,14 @@
 #include <map>
 #include <charconv>
 #include <boost/multiprecision/gmp.hpp>
-#include <boost/math/special_functions/factorials.hpp>
 #include "lib_version.h"
 #include "CLParser.h"
 #include "allocator.h"
 #include "forward_list.h"
+#include "factorial.h"
 
 using namespace std;
 using namespace boost::multiprecision;
-using namespace boost::math;
 
 void help()
 {
@@ -28,26 +27,6 @@ void help()
 void version_ip_filter()
 {
       cout << "Version allocator: " << version() << endl;
-}
-
-int my_factorial(int i)
-{
-      int ret = 1;
-      for (int j = 0; j < i; j++)
-      {
-            ret *= j;
-      }
-
-      return ret;
-}
-
-template <typename T>
-auto factorial(int i) -> T
-{
-      if constexpr (std::is_same<int, T>::value)
-            return my_factorial(i);
-      else
-            return static_cast<T>(factorial<mpf_float_100>(i));
 }
 
 template <typename T>
