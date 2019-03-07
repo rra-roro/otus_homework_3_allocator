@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
             list_default_allocator.push_front(i);
       }
 
-      custom_forward_list<int, custom_allocator<int, 1>> list_my_allocator;
+      custom_forward_list<int, custom_allocator<int, 10>> list_my_allocator;
       for (int i = 0; i < max_item; ++i)
       {
             list_my_allocator.push_front(i);
