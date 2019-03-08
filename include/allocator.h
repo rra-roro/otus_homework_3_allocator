@@ -93,7 +93,7 @@ struct custom_allocator
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
       custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
-            std::cout << __PRETTY_FUNCTION__ << endl;
+            std::cout << __PRETTY_FUNCTION__ << std::endl;
       }
 
 
@@ -111,17 +111,20 @@ struct custom_allocator
 	   то мы не будем выделять под _Container_proxy память из нашего пулла памяти, а напрямую выделем под него память из кучи.
 	 */
       template <typename U,
-          typename Fake = typename std::enable_if<std::is_same<T, std::_Container_proxy>::value, void>::type>
+                typename Fake = typename std::enable_if< std::is_same<T,
+                                                                      std::conditional<static_cast<bool>(_MSC_VER), std::_Container_proxy, void>::type
+                                                                      //std::conditional<static_cast<bool>(__GNUC__), std::_Container_proxy, void>::type            
+                                                                      >::value, void>::type>
       T* allocate(U n)
       {
-            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
             return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
 
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
 
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
@@ -196,7 +199,9 @@ struct custom_allocator
       size_t* m_ref_next_reserve_size = &m_next_reserve_size;
 
 #ifdef _TEST
-      FRIEND_TEST(custom_allocator, DefaultCtor);
+      FRIEND_TEST(CustomAllocatorTest, DefaultCtor);
+      FRIEND_TEST(CustomAllocatorTest, CustomCtor1);
+      FRIEND_TEST(CustomAllocatorTest, CopyCtor);
 #endif
 };
 
