@@ -84,28 +84,17 @@ struct custom_allocator
             static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
       }
 
-      custom_allocator(size_t init_reserve) noexcept : m_init_reserve_size(init_reserve)
+      custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size(init_reserve), m_next_reserve_size(next_reserve)
       {
             static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
       }
 
-	/*
-	  конструктор копирования для custom_allocator<_Container_proxy,5,1>
-	  Поскольку _Container_proxy * custom_allocator<_Container_proxy,5,1>::allocate(unsigned __int64) вызывается один раз, 
-	  то мы не будем выделять под _Container_proxy больше, чем запрашивается при вызове allocate, для этих целей в конструкторе копирования мы задаем m_init_reserve_size(1)
-	*/
-      template <typename U, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
-      custom_allocator(const custom_allocator<U, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_init_reserve_size(1), m_ref_next_reserve_size(&m_next_reserve_size_dummy)
+      template <typename U, size_t initial_reservation, size_t next_reservation>
+      custom_allocator(const custom_allocator<U, initial_reservation, next_reservation>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
+            cout << __PRETTY_FUNCTION__ << endl;
       }
 
-	/*
-	  обычный конструктор копирования для custom_allocator<_Tree_node<pair<int const ,int>,void *>,5,1>
-	*/
-      template <typename T1, typename T2, size_t initial_reservation_a = 1, size_t next_reservation_a = 1>
-      custom_allocator(const custom_allocator<std::pair<T1, T2>, initial_reservation_a, next_reservation_a>& arg_alloc) noexcept : m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
-      {
-      }
 
       template <typename U>
       struct rebind
@@ -113,8 +102,26 @@ struct custom_allocator
             using other = custom_allocator<U, initial_reservation, next_reservation>;
       };
 
+
+      /* 
+	   Платформоспецифическая оптимизация
+	   Специальная ф-ия allocate для выделения памяти под объект _Container_proxy
+	   Поскольку _Container_proxy * custom_allocator<_Container_proxy,5,1>::allocate(unsigned __int64) вызывается один раз, 
+	   то мы не будем выделять под _Container_proxy память из нашего пулла памяти, а напрямую выделем под него память из кучи.
+	 */
+      template <typename U,
+          typename Fake = typename enable_if<is_same<T, std::_Container_proxy>::value, void>::type>
+      T* allocate(U n)
+      {
+            cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+            return static_cast<T*>(malloc(n * sizeof(T)));
+      }
+
+      //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
+            cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
                   if (n > chunks->back().get_size_free_memory())
@@ -185,7 +192,6 @@ struct custom_allocator
       size_t m_init_reserve_size = initial_reservation;
 
       size_t m_next_reserve_size = next_reservation;
-      size_t m_next_reserve_size_dummy = 1;
       size_t* m_ref_next_reserve_size = &m_next_reserve_size;
 };
 
