@@ -93,7 +93,7 @@ struct custom_allocator
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
       custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
-            // std::cout << __PRETTY_FUNCTION__ << std::endl;
+            std::cout << __PRETTY_FUNCTION__ << std::endl;
       }
 
 
@@ -116,7 +116,7 @@ struct custom_allocator
 
       T* allocate(U n)
       {
-            //  std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
             return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
 
@@ -125,7 +125,7 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            // std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
 
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
