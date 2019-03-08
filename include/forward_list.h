@@ -100,6 +100,7 @@ class custom_forward_list
 
   public:
       custom_forward_list() : nodealloc() {}
+      custom_forward_list(const TAlloc& Al) : nodealloc(Al) {}
 
       ~custom_forward_list()
       {
