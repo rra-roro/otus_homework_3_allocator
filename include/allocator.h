@@ -4,13 +4,6 @@
 #include <list>
 #include <type_traits>
 
-#ifdef _MSC_VER
-#define MSVC true
-#else
-#define MSVC false
-#endif
-
-
 template <typename T>
 class memory_chunk
 {
@@ -110,22 +103,24 @@ struct custom_allocator
             using other = custom_allocator<U, initial_reservation, next_reservation>;
       };
 
+#ifdef _MSC_VER
 
       /* 
-	   Платформоспецифическая оптимизация
+	   Платформоспецифическая оптимизация для MS VC
 	   Специальная ф-ия allocate для выделения памяти под объект _Container_proxy
 	   Поскольку _Container_proxy * custom_allocator<_Container_proxy,5,1>::allocate(unsigned __int64) вызывается один раз, 
 	   то мы не будем выделять под _Container_proxy память из нашего пулла памяти, а напрямую выделем под него память из кучи.
 	 */
       template <typename U,
-          typename Fake = typename std::enable_if<std::is_same<T,
-                                                               std::conditional<!static_cast<bool>(MSVC), void, std::_Container_proxy>::type>::value,
-                                                               void>::type>
+          typename Fake = typename std::enable_if<std::is_same<T, std::_Container_proxy>::value, void>::type>
+
       T* allocate(U n)
       {
             //  std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
             return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
+
+#endif // _MSC_VER
 
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
