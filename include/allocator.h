@@ -5,9 +5,9 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-  #define _MSVС true
+  #define MSVС true
 #else
-  #define _MSVС false
+  #define MSVС false
 #endif
 
 
@@ -119,7 +119,7 @@ struct custom_allocator
 	 */
       template <typename U,
           typename Fake = typename std::enable_if<std::is_same<T,
-                                                               std::conditional<static_cast<bool>(_MSVС), std::_Container_proxy, void>::type>::value,
+                                                               std::conditional<static_cast<bool>(MSVС), std::_Container_proxy, void>::type>::value,
                                                                void>::type>
       T* allocate(U n)
       {
