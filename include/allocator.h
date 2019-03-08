@@ -89,8 +89,8 @@ struct custom_allocator
             static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
       }
 
-      template <typename U, size_t initial_reservation, size_t next_reservation>
-      custom_allocator(const custom_allocator<U, initial_reservation, next_reservation>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
+      template <typename U, size_t initial_reservation_, size_t next_reservation_>
+      custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
             cout << __PRETTY_FUNCTION__ << endl;
       }
