@@ -119,7 +119,7 @@ struct custom_allocator
 	 */
       template <typename U,
           typename Fake = typename std::enable_if<std::is_same<T,
-                                                               std::conditional<static_cast<bool>(MSVC), std::_Container_proxy, void>::type>::value,
+                                                               std::conditional<!static_cast<bool>(MSVC), void, std::_Container_proxy>::type>::value,
                                                                void>::type>
       T* allocate(U n)
       {
