@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <list>
+#include  <type_traits>
 
 template <typename T>
 class memory_chunk
@@ -92,7 +93,7 @@ struct custom_allocator
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
       custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
-            cout << __PRETTY_FUNCTION__ << endl;
+            std::cout << __PRETTY_FUNCTION__ << endl;
       }
 
 
@@ -110,17 +111,17 @@ struct custom_allocator
 	   то мы не будем выделять под _Container_proxy память из нашего пулла памяти, а напрямую выделем под него память из кучи.
 	 */
       template <typename U,
-          typename Fake = typename enable_if<is_same<T, std::_Container_proxy>::value, void>::type>
+          typename Fake = typename std::enable_if<std::is_same<T, std::_Container_proxy>::value, void>::type>
       T* allocate(U n)
       {
-            cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
-            return static_cast<T*>(malloc(n * sizeof(T)));
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+            return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
 
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
+            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << endl;
 
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
@@ -193,6 +194,10 @@ struct custom_allocator
 
       size_t m_next_reserve_size = next_reservation;
       size_t* m_ref_next_reserve_size = &m_next_reserve_size;
+
+#ifdef _TEST
+      FRIEND_TEST(custom_allocator, DefaultCtor);
+#endif
 };
 
 template <typename T, size_t reserve_tt, typename U, size_t reserve_tu>
