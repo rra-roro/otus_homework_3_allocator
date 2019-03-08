@@ -7,7 +7,9 @@
 #define _TEST 1
 
 #include "allocator.h"
-#include "../src/main.cpp"
+#include "forward_list.h"
+#include "factorial.h"
+
 
 TEST(version, test1)
 {
