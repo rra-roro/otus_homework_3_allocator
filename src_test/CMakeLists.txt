@@ -33,14 +33,6 @@ find_library(GMP_LIBRARY NAMES gmp libgmp mpir)
 enable_testing()
 find_package(GTest REQUIRED)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    find_library(GMock NAMES gmockd)
-else()
-    find_library(GMock NAMES gmock)
-endif()
-
-message(STATUS "Found GMock: ${GMock}")
-
 message(STATUS "GTest include: ${GTEST_INCLUDE_DIR}")
 
 
@@ -65,5 +57,5 @@ else()
 
 endif ()
 
-target_link_libraries(test_allocator GTest::GTest ${GMock} GTest::Main my_lib ${Boost_LIBRARIES} ${GMP_LIBRARY})
+target_link_libraries(test_allocator GTest::GTest GTest::Main my_lib ${Boost_LIBRARIES} ${GMP_LIBRARY})
 

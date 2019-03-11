@@ -1,7 +1,6 @@
 ﻿#include <string>
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
-#include "gmock/gmock.h"
 
 #include "lib_version.h"
 
@@ -228,125 +227,44 @@ TEST_F(CustomAllocatorTest, next_reserve)
       ASSERT_TRUE(my_alloc.chunks->size() == 0);
 }
 
-
-class UseCustomAllocatorTest : public testing::Test
+TEST_F(CustomAllocatorTest, custom_forward_list1)
 {
-  public:
-      void SetUp() {}
-      void TearDown() {}
-};
-
-using ::testing::_;
-using ::testing::Eq;
-using ::testing::AnyOf;
-using ::testing::Invoke;
-using ::testing::AtMost;
+      std::vector<int> expected = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 
 
-template <typename T, size_t initial_reservation = 1, size_t next_reservation = 1>
-struct mock_custom_allocator
+      custom_forward_list<int, custom_allocator<int, 10>> list_my_allocator;
+      for (int i = 0; i < 14; ++i)
+      {
+            list_my_allocator.push_front(i);
+      }
+
+      auto it_expected = expected.cbegin();
+
+      for (auto& obj : list_my_allocator)
+      {
+            ASSERT_TRUE(*it_expected == obj);
+            it_expected++;
+      }
+}
+
+TEST_F(CustomAllocatorTest, custom_forward_list2)
 {
-      using value_type = T;
+      std::vector<int> expected = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 
-      template <typename U>
-      struct rebind
-      {
-            using other = mock_custom_allocator<U, initial_reservation, next_reservation>;
-      };
+      custom_allocator<int> my_al(10, 5);
 
-      mock_custom_allocator() noexcept : Al()
+      custom_forward_list<int, custom_allocator<int>> list_my_allocator(my_al);
+      for (int i = 0; i < 14; ++i)
       {
-            DelegateToReal();
+            list_my_allocator.push_front(i);
       }
 
-      mock_custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : Al(init_reserve, next_reserve)
+      auto it_expected = expected.cbegin();
+
+      for (auto& obj : list_my_allocator)
       {
-            DelegateToReal();
+            ASSERT_TRUE(*it_expected == obj);
+            it_expected++;
       }
-
-      template <typename U, size_t initial_reservation_, size_t next_reservation_>
-      mock_custom_allocator(const mock_custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : Al(arg_alloc.Al)
-      {
-            DelegateToReal();
-      };
-
-      template <typename U, size_t initial_reservation_, size_t next_reservation_>
-      mock_custom_allocator(mock_custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : Al(arg_alloc.Al)
-      {
-            DelegateToReal();
-      };
-
-
-      void DelegateToReal()
-      {
-            ON_CALL(*this, next_reserve(_))
-                .WillByDefault(Invoke(&Al, &custom_allocator<T, initial_reservation, next_reservation>::next_reserve));
-            ON_CALL(*this, deallocate(_, Eq(1)))
-                .WillByDefault(Invoke(&Al, &custom_allocator<T, initial_reservation, next_reservation>::deallocate));
-
-            if constexpr (std::is_same<T, std::_Container_proxy>::value)
-            {
-                  ON_CALL(*this, allocate(Eq(1)))
-                      .WillByDefault(Invoke(&Al, &custom_allocator<std::_Container_proxy, initial_reservation, next_reservation>::template allocate<size_t, bool>));
-
-                  EXPECT_CALL(*this, allocate(1)).Times(AtMost(1));
-                  EXPECT_CALL(*this, deallocate(_, 1)).Times(AtMost(1));
-            }
-            else
-            {
-                  ON_CALL(*this, allocate(Eq(1)))
-                      .WillByDefault(Invoke(&Al, &custom_allocator<T, initial_reservation, next_reservation>::allocate));
-
-                  EXPECT_CALL(*this, allocate(1)).Times(AtMost(4));
-                  EXPECT_CALL(*this, deallocate(_, 1)).Times(AtMost(4));
-            }
-      }
-
-
-      //  обычная ф-ия выделения памяти для элементов контейнера
-      MOCK_METHOD1_T(allocate, T*(std::size_t n));
-      MOCK_METHOD2_T(deallocate, void(T* p, std::size_t n));
-      MOCK_METHOD1(next_reserve, void(std::size_t count));
-
-      template <typename U, std::size_t initial_reservation_, std::size_t next_reservation_>
-      friend struct mock_custom_allocator;
-
-  private:
-      custom_allocator<T, initial_reservation, next_reservation> Al;
-};
-
-TEST_F(UseCustomAllocatorTest, map)
-{
-      // auto al = mock_custom_allocator<std::pair<const int, int>>();
-
-      auto m = std::map<int, int, std::less<int>, mock_custom_allocator<std::pair<const int, int>>>();
-      m[0] = 0;
-      m[1] = 1;
-      m[2] = 2;
-      m.clear();
-
-      //mock_custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
-      //my_alloc.expect();
-      //auto m = std::map<int, int, std::less<int>, mock_custom_allocator<std::pair<const int, int>>>(my_alloc);
-      //m[0] = 0;
-      //m[1] = 1;
-      //m[2] = 2;
-      //m.clear();
-
-
-      /* {
-            auto m = std::map<int, int, std::less<int>, mock_custom_allocator<std::pair<const int, int>, 2, 2>>();
-            m[0] = 0;
-            m[1] = 1;
-            m[2] = 2;
-            m.clear();
-      }
-      {
-            custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
-            auto m = std::map<int, int, std::less<int>, mock_custom_allocator<std::pair<const int, int>>>(my_alloc);
-            m[0] = 0;
-            m[1] = 1;
-            m[2] = 2;
-            m.clear();
-      }*/
+      
 }

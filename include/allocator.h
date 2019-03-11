@@ -66,8 +66,6 @@ class memory_chunk
 #ifdef _TEST
       FRIEND_TEST(CustomAllocatorTest, allocate_deallocate);
       FRIEND_TEST(CustomAllocatorTest, next_reserve);
-      FRIEND_TEST(CustomAllocatorTest, chunk_shrink_to_fit);
-      FRIEND_TEST(UseCustomAllocatorTest, map);
 #endif
 };
 
@@ -200,11 +198,6 @@ struct custom_allocator
       FRIEND_TEST(CustomAllocatorTest, CopyCtor);
       FRIEND_TEST(CustomAllocatorTest, allocate_deallocate);
       FRIEND_TEST(CustomAllocatorTest, next_reserve);
-      FRIEND_TEST(CustomAllocatorTest, chunk_shrink_to_fit);
-      FRIEND_TEST(UseCustomAllocatorTest, map);
-
-      template <typename U, std::size_t initial_reservation_, std::size_t next_reservation_>
-      friend struct mock_custom_allocator;
 #endif
 };
 
