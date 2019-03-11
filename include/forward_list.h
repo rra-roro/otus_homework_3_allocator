@@ -23,10 +23,10 @@ class node_iter
       using pointer = T*;
       using reference = T&;
 
-      node_iter() : current_node(nullptr) {}
-      node_iter(Node<T>* node) : current_node(node) {}
+      node_iter() noexcept : current_node(nullptr) {}
+      node_iter(Node<T>* node) noexcept : current_node(node) {}
       template <typename U>
-      node_iter(const node_iter<U>& It) : current_node(It.current_node) {}
+      node_iter(const node_iter<U>& It) noexcept : current_node(It.current_node) {}
 
       template <typename U>
       node_iter& operator=(const node_iter<U>& It)
@@ -99,8 +99,8 @@ class custom_forward_list
       Node<T>* ptr_end = nullptr;
 
   public:
-      custom_forward_list() : nodealloc() {}
-      custom_forward_list(const TAlloc& Al) : nodealloc(Al) {}
+      custom_forward_list() noexcept : nodealloc() {}
+      custom_forward_list(const TAlloc& Al) noexcept : nodealloc(Al) {}
 
       ~custom_forward_list()
       {
@@ -121,22 +121,22 @@ class custom_forward_list
             ptr_begin = ptr_curent;
       }
 
-      iterator begin()
+      iterator begin() noexcept
       {
             return iterator(ptr_begin);
       }
 
-      iterator end()
+      iterator end() noexcept
       {
             return iterator(ptr_end);
       }
 
-      const_iterator cbegin()
+      const_iterator cbegin() noexcept
       {
             return const_iterator(ptr_begin);
       }
 
-      const_iterator cend()
+      const_iterator cend() noexcept
       {
             return const_iterator(ptr_end);
       }
