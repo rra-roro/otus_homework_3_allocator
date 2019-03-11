@@ -14,7 +14,7 @@ class memory_chunk
                                          size_free_memory(count_items),
                                          count_use_chunk(0){};
 
-      bool contains(T* ptr)
+      bool contains(T* ptr) const
       {
             return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
       }
@@ -36,29 +36,19 @@ class memory_chunk
             count_use_chunk -= n;
       }
 
-      size_t get_size_free_memory()
+      size_t get_size_free_memory() const
       {
             return size_free_memory;
       }
 
-      bool is_free_memory()
+      bool is_free_memory() const
       {
             return (size_free_memory != 0);
       }
 
-      bool is_used()
+      bool is_used() const
       {
             return (count_use_chunk != 0);
-      }
-
-      void shrink_to_fit()
-      {
-            T* ptr_new = static_cast<T*>(realloc(ptr_start_chunk.get(), get_size_usedbuffer() * sizeof(T)));
-            if (!ptr_new)
-                  return;
-
-            ptr_start_chunk.release();
-            ptr_start_chunk.reset(ptr_new);
       }
 
   private:
@@ -68,10 +58,17 @@ class memory_chunk
       size_t size_free_memory;
       size_t count_use_chunk;
 
-      size_t get_size_usedbuffer()
+      size_t get_size_usedbuffer() const
       {
             return size_buffer - size_free_memory;
       }
+
+#ifdef _TEST
+      FRIEND_TEST(CustomAllocatorTest, allocate_deallocate);
+      FRIEND_TEST(CustomAllocatorTest, next_reserve);
+      FRIEND_TEST(CustomAllocatorTest, chunk_shrink_to_fit);
+      FRIEND_TEST(UseCustomAllocatorTest, map);
+#endif
 };
 
 
@@ -91,11 +88,11 @@ struct custom_allocator
       }
 
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
-      custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size), m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
+      custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size),
+                                                                                                                 m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
-            std::cout << __PRETTY_FUNCTION__ << std::endl;
+            // std::cout << __PRETTY_FUNCTION__ << std::endl;
       }
-
 
       template <typename U>
       struct rebind
@@ -116,7 +113,7 @@ struct custom_allocator
 
       T* allocate(U n)
       {
-            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
+            // std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
             return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
 
@@ -125,14 +122,12 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
+            // std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
 
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
                   if (n > chunks->back().get_size_free_memory())
                   {
-                        chunks->back().shrink_to_fit();
-
                         size_t size_chunk = std::max(n, *m_ref_next_reserve_size);
                         chunks->emplace_back(size_chunk);
                   }
@@ -182,38 +177,44 @@ struct custom_allocator
             return;
       }
 
-      void next_reserve(size_t count)
+      void next_reserve(std::size_t count)
       {
             assert(count > 0);
             m_next_reserve_size = count;
       }
 
-      template <typename U, size_t initial_reservation_, size_t next_reservation_>
+      template <typename U, std::size_t initial_reservation_, std::size_t next_reservation_>
       friend struct custom_allocator;
 
   private:
       std::shared_ptr<std::list<memory_chunk<T>>> chunks = std::make_shared<std::list<memory_chunk<T>>>();
 
-      size_t m_init_reserve_size = initial_reservation;
+      std::size_t m_init_reserve_size = initial_reservation;
 
-      size_t m_next_reserve_size = next_reservation;
-      size_t* m_ref_next_reserve_size = &m_next_reserve_size;
+      std::size_t m_next_reserve_size = next_reservation;
+      std::size_t* m_ref_next_reserve_size = &m_next_reserve_size;
 
 #ifdef _TEST
       FRIEND_TEST(CustomAllocatorTest, DefaultCtor);
       FRIEND_TEST(CustomAllocatorTest, CustomCtor1);
       FRIEND_TEST(CustomAllocatorTest, CopyCtor);
       FRIEND_TEST(CustomAllocatorTest, allocate_deallocate);
+      FRIEND_TEST(CustomAllocatorTest, next_reserve);
+      FRIEND_TEST(CustomAllocatorTest, chunk_shrink_to_fit);
+      FRIEND_TEST(UseCustomAllocatorTest, map);
+
+      template <typename U, std::size_t initial_reservation_, std::size_t next_reservation_>
+      friend struct mock_custom_allocator;
 #endif
 };
 
-template <typename T, size_t reserve_tt, typename U, size_t reserve_tu>
+template <typename T, std::size_t reserve_tt, typename U, std::size_t reserve_tu>
 constexpr bool operator==(const custom_allocator<T, reserve_tt>&, const custom_allocator<U, reserve_tu>&) noexcept
 {
       return true;
 }
 
-template <typename T, size_t reserve_tt, typename U, size_t reserve_tu>
+template <typename T, std::size_t reserve_tt, typename U, std::size_t reserve_tu>
 constexpr bool operator!=(const custom_allocator<T, reserve_tt>&, const custom_allocator<U, reserve_tu>&) noexcept
 {
       return false;
