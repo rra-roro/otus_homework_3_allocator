@@ -9,7 +9,6 @@ add_subdirectory(src)
 add_subdirectory(src_test)   
 
 install(PROGRAMS src/allocator src_test/test_allocator DESTINATION bin)
-#install(FILES googletest-release-1.8.0/googlemock/gtest/libgtest_main.so googletest-release-1.8.0/googlemock/gtest/libgtest.so DESTINATION /tmp/allocator)
 
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${CMAKE_CURRENT_SOURCE_DIR}/cpack_script/postinst)
 

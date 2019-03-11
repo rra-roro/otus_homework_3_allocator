@@ -58,12 +58,5 @@ else()
 
 endif ()
 
-message(STATUS "GTest lib: ${GTEST_LIBRARIES}")
-
-#ADD_LIBRARY(boost_unit_test_framework STATIC IMPORTED)
-#SET_TARGET_PROPERTIES(boost_unit_test_framework PROPERTIES
-#    IMPORTED_LOCATION /usr/lib/libboost_unit_test_framework.a)
-#TARGET_LINK_LIBRARIES(mytarget A boost_unit_test_framework C)
-
 target_link_libraries(test_allocator GTest::GTest GTest::Main my_lib ${Boost_LIBRARIES} ${GMP_LIBRARY})
 
