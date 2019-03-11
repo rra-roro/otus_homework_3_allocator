@@ -10,8 +10,6 @@ add_subdirectory(src_test)
 
 install(PROGRAMS src/allocator src_test/test_allocator DESTINATION bin)
 
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${CMAKE_CURRENT_SOURCE_DIR}/cpack_script/postinst)
-
 set(CPACK_GENERATOR DEB)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-mv -u /tmp/ip_filter/libgtest_main.so  /usr/lib/
-mv -u /tmp/ip_filter/libgtest.so  /usr/lib/
-
-exit 0
