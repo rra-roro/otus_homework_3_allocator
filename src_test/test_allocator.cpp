@@ -268,3 +268,31 @@ TEST_F(CustomAllocatorTest, custom_forward_list2)
       }
       
 }
+
+TEST_F(CustomAllocatorTest, custom_forward_list3)
+{
+      std::vector<int> expected = { 8, 7, 6, 5, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0 };
+
+      custom_allocator<int> my_al(5, 2);
+
+      custom_forward_list<int, custom_allocator<int>> list_my_allocator(my_al);
+      for (int i = 0; i < 5; ++i)
+      {
+            list_my_allocator.push_front(i);
+      }
+
+      my_al.next_reserve(20);
+
+      for (int i = 0; i < 9; ++i)
+      {
+            list_my_allocator.push_front(i);
+      }
+
+      auto it_expected = expected.cbegin();
+
+      for (auto& obj : list_my_allocator)
+      {
+            ASSERT_TRUE(*it_expected == obj);
+            it_expected++;
+      }
+}
