@@ -24,7 +24,7 @@ class memory_chunk
       T* allocate_from(size_t n)
       {
             assert(ptr_next_item_mem != nullptr);
-            assert((count_use_chunk + n) > count_use_chunk);
+            assert((count_use_chunk + n) < size_buffer);
             assert(size_free_memory >= n);
 
             count_use_chunk += n;
@@ -38,7 +38,7 @@ class memory_chunk
 
       void deallocate_from(size_t n) noexcept
       {
-            assert(count_use_chunk >= n);
+            assert((count_use_chunk - n) < count_use_chunk);
             count_use_chunk -= n;
       }
 
