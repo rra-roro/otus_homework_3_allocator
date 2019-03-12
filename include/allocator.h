@@ -16,12 +16,17 @@ class memory_chunk
 
       bool contains(T* ptr) const
       {
+            assert(ptr_next_item_mem != nullptr);
+
             return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
       }
 
       T* allocate_from(size_t n)
       {
-            // To Do: сделать assert(ptr_next_item_mem != 0)
+            assert(ptr_next_item_mem != nullptr);
+            assert((count_use_chunk + n) > count_use_chunk);
+            assert(size_free_memory >= n);
+
             count_use_chunk += n;
             size_free_memory -= n;
 
@@ -31,22 +36,23 @@ class memory_chunk
             return ptr_current_item;
       }
 
-      void deallocate_from(size_t n)
+      void deallocate_from(size_t n) noexcept
       {
+            assert(count_use_chunk >= n);
             count_use_chunk -= n;
       }
 
-      size_t get_size_free_memory() const
+      size_t get_size_free_memory() const noexcept
       {
             return size_free_memory;
       }
 
-      bool is_free_memory() const
+      bool is_free_memory() const noexcept
       {
             return (size_free_memory != 0);
       }
 
-      bool is_used() const
+      bool is_used() const noexcept
       {
             return (count_use_chunk != 0);
       }
@@ -58,7 +64,7 @@ class memory_chunk
       size_t size_free_memory;
       size_t count_use_chunk;
 
-      size_t get_size_usedbuffer() const
+      size_t get_size_usedbuffer() const noexcept
       {
             return size_buffer - size_free_memory;
       }
@@ -77,19 +83,21 @@ struct custom_allocator
 
       custom_allocator() noexcept
       {
-            static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
+            static_assert(initial_reservation != 0 && next_reservation != 0,
+                "custom_allocator's template args 'initial_reservation' and 'next_reservation' should not be ZERO");
       }
 
-      custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size(init_reserve), m_next_reserve_size(next_reserve)
+      custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size(init_reserve),
+                                                                            m_next_reserve_size(next_reserve)
       {
-            static_assert(initial_reservation > 0 && next_reservation > 0, "custom_allocator's template args 'initial_reservation' and 'next_reservation' must be greater ZERO");
+            static_assert(initial_reservation != 0 && next_reservation != 0,
+                "custom_allocator's template args 'initial_reservation' and 'next_reservation' should not be ZERO");
       }
 
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
       custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : m_init_reserve_size(arg_alloc.m_init_reserve_size),
                                                                                                                  m_ref_next_reserve_size(arg_alloc.m_ref_next_reserve_size)
       {
-            // std::cout << __PRETTY_FUNCTION__ << std::endl;
       }
 
       template <typename U>
@@ -111,7 +119,6 @@ struct custom_allocator
 
       T* allocate(U n)
       {
-            // std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
             return static_cast<T*>(std::malloc(n * sizeof(T)));
       }
 
@@ -120,8 +127,6 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            // std::cout << __PRETTY_FUNCTION__ << "\nmem_size=" << n * sizeof(T) << std::endl;
-
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
                   if (n > chunks->back().get_size_free_memory())
@@ -177,7 +182,7 @@ struct custom_allocator
 
       void next_reserve(std::size_t count)
       {
-            assert(count > 0);
+            assert(count != 0);
             m_next_reserve_size = count;
       }
 

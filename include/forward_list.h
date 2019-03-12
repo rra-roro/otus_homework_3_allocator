@@ -29,7 +29,7 @@ class node_iter
       node_iter(const node_iter<U>& It) noexcept : current_node(It.current_node) {}
 
       template <typename U>
-      node_iter& operator=(const node_iter<U>& It)
+      node_iter& operator=(const node_iter<U>& It) noexcept
       {
             if (this == &It)
             {
@@ -50,13 +50,13 @@ class node_iter
       }
 
       template <typename U>
-      bool operator==(const node_iter<U>& It)
+      bool operator==(const node_iter<U>& It) const noexcept
       {
             return current_node == It.current_node;
       }
 
       template <typename U>
-      bool operator!=(const node_iter<U>& It)
+      bool operator!=(const node_iter<U>& It) const noexcept
       {
             return current_node != It.current_node;
       }
@@ -104,7 +104,7 @@ class custom_forward_list
 
       ~custom_forward_list()
       {
-            while(ptr_begin != ptr_end)
+            while (ptr_begin != ptr_end)
             {
                   Node<T>* next = ptr_begin->next;
                   std::allocator_traits<TNodeAlloc>::destroy(nodealloc, ptr_begin);

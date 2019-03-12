@@ -266,7 +266,6 @@ TEST_F(CustomAllocatorTest, custom_forward_list2)
             ASSERT_TRUE(*it_expected == obj);
             it_expected++;
       }
-      
 }
 
 TEST_F(CustomAllocatorTest, custom_forward_list3)
