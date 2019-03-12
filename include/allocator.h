@@ -24,7 +24,7 @@ class memory_chunk
       T* allocate_from(size_t n)
       {
             assert(ptr_next_item_mem != nullptr);
-            assert((count_use_chunk + n) < size_buffer);
+            assert((count_use_chunk + n) <= size_buffer);
             assert(size_free_memory >= n);
 
             count_use_chunk += n;
