@@ -127,9 +127,11 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            if (!chunks->empty() && chunks->back().is_free_memory())
+            auto& chunks_back = chunks->back();
+
+            if (!chunks->empty() && chunks_back.is_free_memory())
             {
-                  if (n > chunks->back().get_size_free_memory())
+                  if (n > chunks_back.get_size_free_memory())
                   {
                         size_t size_chunk = std::max(n, *m_ref_next_reserve_size);
                         chunks->emplace_back(size_chunk);
@@ -147,7 +149,7 @@ struct custom_allocator
 
                   return chunks->back().allocate_from(n);
             }
-            else if (!chunks->back().is_free_memory() && *m_ref_next_reserve_size == 1)
+            else if (!chunks_back.is_free_memory() && *m_ref_next_reserve_size == 1)
             {
                   return static_cast<T*>(malloc(n * sizeof(T)));
             }
@@ -163,7 +165,7 @@ struct custom_allocator
 
       void deallocate(T* p, std::size_t n)
       {
-            for (auto it_chunk = chunks->begin(); it_chunk != chunks->end(); it_chunk++)
+            for (auto it_chunk = chunks->begin(); it_chunk != chunks->end(); ++it_chunk)
             {
                   if (it_chunk->contains(p))
                   {
