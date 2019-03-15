@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <memory>
+#include <new>
 #include <list>
 #include <type_traits>
 
@@ -8,7 +8,8 @@ template <typename T>
 class memory_chunk
 {
   public:
-      memory_chunk(size_t count_items) : ptr_start_chunk(static_cast<T*>(malloc(count_items * sizeof(T))), std::free),
+      memory_chunk(size_t count_items) : ptr_start_chunk(static_cast<T*>(::operator new[](count_items * sizeof(T))),
+                                             [](T* p) { ::operator delete[](p); }),
                                          size_buffer(count_items),
                                          ptr_next_item_mem(ptr_start_chunk.get()),
                                          size_free_memory(count_items),
@@ -58,7 +59,7 @@ class memory_chunk
       }
 
   private:
-      std::unique_ptr<T, decltype(std::free)*> ptr_start_chunk;
+      std::unique_ptr<T, void (*)(T*)> ptr_start_chunk;
       size_t size_buffer;
       T* ptr_next_item_mem;
       size_t size_free_memory;
@@ -81,17 +82,11 @@ struct custom_allocator
 {
       using value_type = T;
 
-      custom_allocator() noexcept
-      {
-            static_assert(initial_reservation != 0 && next_reservation != 0,
-                "custom_allocator's template args 'initial_reservation' and 'next_reservation' should not be ZERO");
-      }
+      custom_allocator() noexcept = default;
 
-      custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size(init_reserve),
-                                                                            m_next_reserve_size(next_reserve)
+      custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size((init_reserve == 0) ? 1 : init_reserve),
+                                                                            m_next_reserve_size((next_reserve == 0) ? 1 : next_reserve)
       {
-            static_assert(initial_reservation != 0 && next_reservation != 0,
-                "custom_allocator's template args 'initial_reservation' and 'next_reservation' should not be ZERO");
       }
 
       template <typename U, size_t initial_reservation_, size_t next_reservation_>
@@ -127,20 +122,18 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
-            auto& chunks_back = chunks->back();
-
-            if (!chunks->empty() && chunks_back.is_free_memory())
+            if (!chunks->empty() && chunks->back().is_free_memory())
             {
-                  if (n > chunks_back.get_size_free_memory())
+                  if (n > chunks->back().get_size_free_memory())
                   {
                         size_t size_chunk = std::max(n, *m_ref_next_reserve_size);
                         chunks->emplace_back(size_chunk);
                   }
                   return chunks->back().allocate_from(n);
             }
-            else if (chunks->empty() && m_init_reserve_size == 1)
+            else if (m_init_reserve_size == 1 || (!chunks->empty() && !chunks->back().is_free_memory() && *m_ref_next_reserve_size == 1))
             {
-                  return static_cast<T*>(malloc(n * sizeof(T)));
+                  return static_cast<T*>(::operator new[](n * sizeof(T)));
             }
             else if (chunks->empty())
             {
@@ -148,10 +141,6 @@ struct custom_allocator
                   chunks->emplace_back(size_chunk);
 
                   return chunks->back().allocate_from(n);
-            }
-            else if (!chunks_back.is_free_memory() && *m_ref_next_reserve_size == 1)
-            {
-                  return static_cast<T*>(malloc(n * sizeof(T)));
             }
             else //if (!chunks->back().is_free_memory())
             {
@@ -178,7 +167,7 @@ struct custom_allocator
                   }
             }
 
-            free(p);
+            ::operator delete[](p);
             return;
       }
 
@@ -194,9 +183,9 @@ struct custom_allocator
   private:
       std::shared_ptr<std::list<memory_chunk<T>>> chunks = std::make_shared<std::list<memory_chunk<T>>>();
 
-      std::size_t m_init_reserve_size = initial_reservation;
+      std::size_t m_init_reserve_size = (initial_reservation == 0) ? 1 : initial_reservation;
 
-      std::size_t m_next_reserve_size = next_reservation;
+      std::size_t m_next_reserve_size = (next_reservation == 0) ? 1 : next_reservation;
       std::size_t* m_ref_next_reserve_size = &m_next_reserve_size;
 
 #ifdef _TEST
