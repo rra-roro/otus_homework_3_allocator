@@ -82,7 +82,9 @@ struct custom_allocator
 {
       using value_type = T;
 
-      custom_allocator() noexcept = default;
+      custom_allocator() noexcept
+      {
+      };
 
       custom_allocator(size_t init_reserve, size_t next_reserve) noexcept : m_init_reserve_size((init_reserve == 0) ? 1 : init_reserve),
                                                                             m_next_reserve_size((next_reserve == 0) ? 1 : next_reserve)
