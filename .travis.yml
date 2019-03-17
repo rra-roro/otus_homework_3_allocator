@@ -24,7 +24,7 @@ before_script:
 - tar xf release-1.8.0.tar.gz
 - cd googletest-release-1.8.0
 - CXX=/usr/bin/g++-8 CC=/usr/bin/gcc-8
-- cmake -DBUILD_SHARED_LIBS=ON .
+- cmake -DBUILD_SHARED_LIBS=OFF .
 - make
 - sudo cp -a googletest/include/gtest /usr/include
 - sudo cp -a googlemock/gtest/libgtest_main.a /usr/lib/
