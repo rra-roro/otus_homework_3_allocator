@@ -129,6 +129,11 @@ struct custom_allocator
       //  обычная ф-ия выделения памяти для элементов контейнера
       T* allocate(std::size_t n)
       {
+            if (chunks == nullptr)
+            {
+                  chunks = std::make_shared<std::list<memory_chunk<T>>>();
+            }
+
             if (!chunks->empty() && chunks->back().is_free_memory())
             {
                   if (n > chunks->back().get_size_free_memory())
@@ -161,16 +166,19 @@ struct custom_allocator
 
       void deallocate(T* p, std::size_t n)
       {
-            for (auto it_chunk = chunks->begin(); it_chunk != chunks->end(); ++it_chunk)
+            if (chunks != nullptr)
             {
-                  if (it_chunk->contains(p))
+                  for (auto it_chunk = chunks->begin(); it_chunk != chunks->end(); ++it_chunk)
                   {
-                        it_chunk->deallocate_from(n);
+                        if (it_chunk->contains(p))
+                        {
+                              it_chunk->deallocate_from(n);
 
-                        if (!it_chunk->is_used())
-                              chunks->erase(it_chunk);
+                              if (!it_chunk->is_used())
+                                    chunks->erase(it_chunk);
 
-                        return;
+                              return;
+                        }
                   }
             }
 
@@ -188,7 +196,7 @@ struct custom_allocator
       friend struct custom_allocator;
 
   private:
-      std::shared_ptr<std::list<memory_chunk<T>>> chunks = std::make_shared<std::list<memory_chunk<T>>>();
+      std::shared_ptr<std::list<memory_chunk<T>>> chunks = nullptr;
 
       std::size_t m_init_reserve_size = (initial_reservation == 0) ? 1 : initial_reservation;
 

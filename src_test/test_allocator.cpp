@@ -95,79 +95,86 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
 {
       {
             custom_allocator<std::pair<const int, int>> my_alloc;
-            ASSERT_TRUE(my_alloc.chunks->empty() == true);
-            ASSERT_TRUE(my_alloc.chunks->size() == 0);
+            ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
 
             my_alloc.deallocate(ptr, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
       }
 
       {
             custom_allocator<std::pair<const int, int>, 0, 2> my_alloc;
-            ASSERT_TRUE(my_alloc.chunks->empty() == true);
-            ASSERT_TRUE(my_alloc.chunks->size() == 0);
+            ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
 
             std::pair<const int, int>* ptr2 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
 
             my_alloc.deallocate(ptr1, 1);
             my_alloc.deallocate(ptr2, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
       }
 
       {
             custom_allocator<std::pair<const int, int>, 2, 0> my_alloc;
-            ASSERT_TRUE(my_alloc.chunks->empty() == true);
-            ASSERT_TRUE(my_alloc.chunks->size() == 0);
+            ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
             std::pair<const int, int>* ptr2 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
             std::pair<const int, int>* ptr3 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
 
             my_alloc.deallocate(ptr1, 1);
             my_alloc.deallocate(ptr2, 1);
             my_alloc.deallocate(ptr3, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
       }
 
       {
             custom_allocator<std::pair<const int, int>, 1, 1> my_alloc;
-            ASSERT_TRUE(my_alloc.chunks->empty() == true);
-            ASSERT_TRUE(my_alloc.chunks->size() == 0);
+            ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
 
             my_alloc.deallocate(ptr, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
       }
 
       {
             custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
-            ASSERT_TRUE(my_alloc.chunks->empty() == true);
-            ASSERT_TRUE(my_alloc.chunks->size() == 0);
+            ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
             ASSERT_TRUE(my_alloc.chunks->back().is_used() == true);
@@ -177,6 +184,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
             ASSERT_TRUE(my_alloc.chunks->back().get_size_free_memory() == 1);
 
             std::pair<const int, int>* ptr2 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
             ASSERT_TRUE(my_alloc.chunks->back().is_used() == true);
@@ -186,6 +194,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
             ASSERT_TRUE(my_alloc.chunks->back().get_size_free_memory() == 0);
 
             std::pair<const int, int>* ptr3 = my_alloc.allocate(1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 2);
             ASSERT_TRUE(my_alloc.chunks->front().is_used() == true);
@@ -200,6 +209,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
             ASSERT_TRUE(my_alloc.chunks->back().get_size_free_memory() == 1);
 
             my_alloc.deallocate(ptr1, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 2);
             ASSERT_TRUE(my_alloc.chunks->front().is_used() == true);
@@ -214,6 +224,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
             ASSERT_TRUE(my_alloc.chunks->back().get_size_free_memory() == 1);
 
             my_alloc.deallocate(ptr2, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == false);
             ASSERT_TRUE(my_alloc.chunks->size() == 1);
             ASSERT_TRUE(my_alloc.chunks->back().is_used() == true);
@@ -224,6 +235,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
             ASSERT_TRUE(my_alloc.chunks->back().get_size_free_memory() == 1);
 
             my_alloc.deallocate(ptr3, 1);
+            ASSERT_TRUE(my_alloc.chunks != nullptr);
             ASSERT_TRUE(my_alloc.chunks->empty() == true);
             ASSERT_TRUE(my_alloc.chunks->size() == 0);
       }
@@ -232,29 +244,32 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
 TEST_F(CustomAllocatorTest, next_reserve)
 {
       custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
-      ASSERT_TRUE(my_alloc.chunks->empty() == true);
-      ASSERT_TRUE(my_alloc.chunks->size() == 0);
+      ASSERT_TRUE(my_alloc.chunks == nullptr);
       ASSERT_TRUE(my_alloc.m_init_reserve_size == 2);
       ASSERT_TRUE(my_alloc.m_next_reserve_size == 2);
 
 
       std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
       std::pair<const int, int>* ptr2 = my_alloc.allocate(1);
+      ASSERT_TRUE(my_alloc.chunks != nullptr);
       ASSERT_TRUE(my_alloc.chunks->empty() == false);
       ASSERT_TRUE(my_alloc.chunks->size() == 1);
       ASSERT_TRUE(my_alloc.chunks->back().size_buffer = 2);
 
       std::pair<const int, int>* ptr3 = my_alloc.allocate(1);
       std::pair<const int, int>* ptr4 = my_alloc.allocate(1);
+      ASSERT_TRUE(my_alloc.chunks != nullptr);
       ASSERT_TRUE(my_alloc.chunks->empty() == false);
       ASSERT_TRUE(my_alloc.chunks->size() == 2);
       ASSERT_TRUE(my_alloc.chunks->back().size_buffer = 2);
 
       my_alloc.next_reserve(4);
+      ASSERT_TRUE(my_alloc.chunks != nullptr);
       ASSERT_TRUE(my_alloc.m_init_reserve_size == 2);
       ASSERT_TRUE(my_alloc.m_next_reserve_size == 4);
 
       std::pair<const int, int>* ptr5 = my_alloc.allocate(1);
+      ASSERT_TRUE(my_alloc.chunks != nullptr);
       ASSERT_TRUE(my_alloc.chunks->empty() == false);
       ASSERT_TRUE(my_alloc.chunks->size() == 3);
       ASSERT_TRUE(my_alloc.chunks->back().size_buffer = 4);
@@ -264,6 +279,7 @@ TEST_F(CustomAllocatorTest, next_reserve)
       my_alloc.deallocate(ptr3, 1);
       my_alloc.deallocate(ptr4, 1);
       my_alloc.deallocate(ptr5, 1);
+      ASSERT_TRUE(my_alloc.chunks != nullptr);
       ASSERT_TRUE(my_alloc.chunks->empty() == true);
       ASSERT_TRUE(my_alloc.chunks->size() == 0);
 }
