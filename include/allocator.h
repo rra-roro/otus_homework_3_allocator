@@ -9,26 +9,21 @@ template <typename T>
 class memory_chunk
 {
   public:
-      memory_chunk(size_t count_items) noexcept : ptr_start_chunk(nullptr, [](T* p) { ::operator delete[](p); }),
-                                                  size_buffer(count_items),
-                                                  ptr_next_item_mem(nullptr),
-                                                  size_free_memory(count_items),
-                                                  count_use_chunk(0){};
+      memory_chunk(size_t count_items) : ptr_start_chunk(static_cast<T*>(::operator new[](count_items * sizeof(T))),
+                                             [](T* p) { ::operator delete[](p); }),
+                                         size_buffer(count_items),
+                                         ptr_next_item_mem(ptr_start_chunk.get()),
+                                         size_free_memory(count_items),
+                                         count_use_chunk(0){};
 
       bool contains(T* ptr) const
       {
-              return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
+            assert(ptr_next_item_mem != nullptr);
+            return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
       }
 
       T* allocate_from(size_t n)
       {
-            if (ptr_start_chunk == nullptr)
-            {
-                  ptr_start_chunk.reset(static_cast<T*>(::operator new[](size_buffer * sizeof(T))));
-                  ptr_next_item_mem = ptr_start_chunk.get();                    
-            }
-
-            assert(ptr_start_chunk != nullptr);
             assert(ptr_next_item_mem != nullptr);
             assert((count_use_chunk + n) <= size_buffer);
             assert(size_free_memory >= n);
@@ -44,9 +39,7 @@ class memory_chunk
 
       void deallocate_from(size_t n) noexcept
       {
-            assert(ptr_start_chunk != nullptr);
             assert((count_use_chunk - n) < count_use_chunk);
-
             count_use_chunk -= n;
       }
 
