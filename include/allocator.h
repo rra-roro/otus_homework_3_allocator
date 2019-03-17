@@ -114,7 +114,7 @@ struct custom_allocator
 
       T* allocate(U n)
       {
-            return static_cast<T*>(std::malloc(n * sizeof(T)));
+            return static_cast<T*>(::operator new[](n * sizeof(T)));
       }
 
 #endif // _MSC_VER
