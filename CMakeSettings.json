@@ -4,7 +4,12 @@
             "BUILD_ROOT": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
             "INSTALL_ROOT": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
             "STATIC_LINK_LIBS": "-DSTATIC_LINK_LIBS=\"YES\" -DVCPKG_TARGET_TRIPLET=x64-windows-static",
-            "TRAVIS_BUILD_NUMBER": "1"
+            "TRAVIS_BUILD_NUMBER": "1",
+            "esp.extensions": "cppcorecheck.dll",
+            "esp.annotationbuildlevel": "ignore",
+            "caexcludepath": "C:\\MyCode\\MyLib\\boost_1_69_0\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\VC\\;C:\\Program Files (x86)\\Windows Kits\\10\\Include\\;c:\\mycode\\mylib\\vcpkg\\installed\\",
+            "CNCC_PATH": "C:/PortableSoft/Tools Programer/clang-tools/cncc",
+            "PVS_Studio_PATH": "C:/Program Files (x86)/PVS-Studio"
         }
     ],
     "configurations": [

@@ -33,22 +33,48 @@ endif (Boost_FOUND)
 find_path(GMP_INCLUDE_DIRS NAMES gmp.h)
 find_library(GMP_LIBRARY NAMES gmp libgmp mpir)
 
-add_executable(allocator main.cpp)
-target_include_directories(allocator PUBLIC "../include/" "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/.." "${Boost_INCLUDE_DIR}" "${GMP_INCLUDE_DIRS}")
+SET(TARGT_NAME allocator)
+SET(ALL_SOURCE main.cpp)
+SET(ALL_INCLUDE "../include/" "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/.." "${Boost_INCLUDE_DIR}" "${GMP_INCLUDE_DIRS}")
+SET(ALL_LIBS my_lib ${Boost_LIBRARIES} ${GMP_LIBRARY})
+
+add_executable(${TARGT_NAME} ${ALL_SOURCE})
+target_include_directories(${TARGT_NAME} PUBLIC ${ALL_INCLUDE})
 
 if (MSVC)
 
     message(STATUS "MSVC")
 
-	set_target_properties(allocator PROPERTIES
+    set_target_properties(${TARGT_NAME} PROPERTIES
       CXX_STANDARD 17
       CXX_STANDARD_REQUIRED ON
       COMPILE_OPTIONS "/permissive-;/Zc:wchar_t"
     )
 
+    add_library(${TARGT_NAME}.analyze OBJECT ${ALL_SOURCE})
+    target_include_directories(${TARGT_NAME}.analyze PUBLIC ${ALL_INCLUDE})
+	set_target_properties(${TARGT_NAME}.analyze PROPERTIES
+      CXX_STANDARD 17
+      CXX_STANDARD_REQUIRED ON
+      COMPILE_OPTIONS "/c;/permissive-;/Zc:wchar_t;/analyze:only;/analyze:pluginEspXEngine.dll"
+    )
+    set_target_properties(${TARGT_NAME}.analyze PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+    set(PVS_Studio_PATH $ENV{PVS_Studio_PATH})
+    if(PVS_Studio_PATH)
+            include("${PVS_Studio_PATH}/PVS-Studio.cmake")
+            pvs_studio_add_target(TARGET ${TARGT_NAME}.analyzePVS ALL
+                                  OUTPUT FORMAT errorfile
+                                  ANALYZE ${TARGT_NAME}
+                                  MODE GA:1,2 OP
+                                  LOG ${CMAKE_CURRENT_BINARY_DIR}/target.err
+                                  BIN "${PVS_Studio_PATH}/CompilerCommandsAnalyzer.exe")
+            set_target_properties(${TARGT_NAME}.analyzePVS PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    endif ()
+
 else()
 
-	set_target_properties(allocator PROPERTIES
+	set_target_properties(${TARGT_NAME} PROPERTIES
 		  CXX_STANDARD 17
 		  CXX_STANDARD_REQUIRED ON
 		  COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
@@ -59,4 +85,5 @@ endif ()
 
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}" " /VERBOSE:LIB")
 
-target_link_libraries(allocator my_lib ${Boost_LIBRARIES} ${GMP_LIBRARY})
+target_link_libraries(${TARGT_NAME} ${ALL_LIBS})
+
