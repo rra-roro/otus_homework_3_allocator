@@ -61,6 +61,13 @@
     где <i>size</i> - это число элементов контейнера, т.е. другими словами, это то число, до которого мы будем считать факториалы.
     <i>size</i> - ничем не ограничен, только памятью компьютера и временем вычислений.
 
+5)  Дополнительно для Visual Studio я добавил три новых targets в проект Cmake,
+    что позволяет делать дополнительную проверку кода:
+    *) C++ Core Guidelines checkers - 
+       https://github.com/MicrosoftDocs/visualstudio-docs/blob/master/docs/code-quality/using-the-cpp-core-guidelines-checkers.md
+    *) PVS_Studio checkers
+    *) Customizable Naming Convention Checker - https://github.com/mapbox/cncc/tree/multi-file
+
 <b>Для сборки проекта под Windows я использовал</b>
   - boost 1_69_0         - библиотека собрана:    .\b2 --build-type=complete --stagedir=.\
   - Googletest, mpir     - библиотеки установлены через vcpkg
