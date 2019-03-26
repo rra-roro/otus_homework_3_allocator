@@ -16,85 +16,88 @@ TEST(version, test1)
       ASSERT_TRUE(version() > 0);
 }
 
-class CustomAllocatorTest : public testing::Test
+namespace roro_lib
 {
-  public:
-      void SetUp() {}
-      void TearDown() {}
-};
-
-
-TEST_F(CustomAllocatorTest, DefaultCtor)
-{
-      custom_allocator<std::pair<const int, int>> my_alloc1;
-      ASSERT_TRUE(my_alloc1.m_init_reserve_size == 1);
-      ASSERT_TRUE(my_alloc1.m_next_reserve_size == 1);
-      ASSERT_TRUE(my_alloc1.m_ref_next_reserve_size == &my_alloc1.m_next_reserve_size);
-
-      custom_allocator<std::pair<const int, int>, 5> my_alloc2;
-      ASSERT_TRUE(my_alloc2.m_init_reserve_size == 5);
-      ASSERT_TRUE(my_alloc2.m_next_reserve_size == 1);
-      ASSERT_TRUE(my_alloc2.m_ref_next_reserve_size == &my_alloc2.m_next_reserve_size);
-
-      custom_allocator<std::pair<const int, int>, 5, 10> my_alloc3;
-      ASSERT_TRUE(my_alloc3.m_init_reserve_size == 5);
-      ASSERT_TRUE(my_alloc3.m_next_reserve_size == 10);
-      ASSERT_TRUE(my_alloc3.m_ref_next_reserve_size == &my_alloc3.m_next_reserve_size);
+      class custom_allocator_test : public testing::Test
+      {
+        public:
+            void SetUp() {}
+            void TearDown() {}
+      };
 }
 
-TEST_F(CustomAllocatorTest, CustomCtor1)
+
+TEST_F(roro_lib::custom_allocator_test, DefaultCtor)
 {
-      custom_allocator<std::pair<const int, int>> my_alloc1(5, 10);
-      ASSERT_TRUE(my_alloc1.m_init_reserve_size == 5);
-      ASSERT_TRUE(my_alloc1.m_next_reserve_size == 10);
-      ASSERT_TRUE(my_alloc1.m_ref_next_reserve_size == &my_alloc1.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>> my_alloc1;
+      ASSERT_TRUE(my_alloc1.init_reserve_size == 1);
+      ASSERT_TRUE(my_alloc1.next_reserve_size == 1);
+      ASSERT_TRUE(my_alloc1.ref_next_reserve_size == &my_alloc1.next_reserve_size);
 
-      custom_allocator<std::pair<const int, int>, 2> my_alloc2(5, 10);
-      ASSERT_TRUE(my_alloc2.m_init_reserve_size == 5);
-      ASSERT_TRUE(my_alloc2.m_next_reserve_size == 10);
-      ASSERT_TRUE(my_alloc2.m_ref_next_reserve_size == &my_alloc2.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>, 5> my_alloc2;
+      ASSERT_TRUE(my_alloc2.init_reserve_size == 5);
+      ASSERT_TRUE(my_alloc2.next_reserve_size == 1);
+      ASSERT_TRUE(my_alloc2.ref_next_reserve_size == &my_alloc2.next_reserve_size);
 
-      custom_allocator<std::pair<const int, int>, 2, 2> my_alloc3(5, 10);
-      ASSERT_TRUE(my_alloc3.m_init_reserve_size == 5);
-      ASSERT_TRUE(my_alloc3.m_next_reserve_size == 10);
-      ASSERT_TRUE(my_alloc3.m_ref_next_reserve_size == &my_alloc3.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>, 5, 10> my_alloc3;
+      ASSERT_TRUE(my_alloc3.init_reserve_size == 5);
+      ASSERT_TRUE(my_alloc3.next_reserve_size == 10);
+      ASSERT_TRUE(my_alloc3.ref_next_reserve_size == &my_alloc3.next_reserve_size);
 }
 
-TEST_F(CustomAllocatorTest, CopyCtor)
+TEST_F(roro_lib::custom_allocator_test, CustomCtor1)
 {
-      custom_allocator<std::pair<const int, int>> my_alloc1;
-      custom_allocator<std::pair<const int, int>> ret_alloc1(my_alloc1);
-      ASSERT_TRUE(ret_alloc1.m_init_reserve_size == 1);
-      ASSERT_TRUE(ret_alloc1.m_next_reserve_size == 1);
-      ASSERT_TRUE(*ret_alloc1.m_ref_next_reserve_size == 1);
-      ASSERT_TRUE(ret_alloc1.m_ref_next_reserve_size == &my_alloc1.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>> my_alloc1(5, 10);
+      ASSERT_TRUE(my_alloc1.init_reserve_size == 5);
+      ASSERT_TRUE(my_alloc1.next_reserve_size == 10);
+      ASSERT_TRUE(my_alloc1.ref_next_reserve_size == &my_alloc1.next_reserve_size);
 
-      custom_allocator<std::pair<const int, int>, 5> my_alloc2;
-      custom_allocator<std::pair<const int, int>> ret_alloc2(my_alloc2);
-      ASSERT_TRUE(ret_alloc2.m_init_reserve_size == 5);
-      ASSERT_TRUE(ret_alloc2.m_next_reserve_size == 1);
-      ASSERT_TRUE(*ret_alloc2.m_ref_next_reserve_size == 1);
-      ASSERT_TRUE(ret_alloc2.m_ref_next_reserve_size == &my_alloc2.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>, 2> my_alloc2(5, 10);
+      ASSERT_TRUE(my_alloc2.init_reserve_size == 5);
+      ASSERT_TRUE(my_alloc2.next_reserve_size == 10);
+      ASSERT_TRUE(my_alloc2.ref_next_reserve_size == &my_alloc2.next_reserve_size);
 
-      custom_allocator<std::pair<const int, int>, 5, 10> my_alloc3;
-      custom_allocator<std::pair<const int, int>> ret_alloc3(my_alloc3);
-      ASSERT_TRUE(ret_alloc3.m_init_reserve_size == 5);
-      ASSERT_TRUE(ret_alloc3.m_next_reserve_size == 1);
-      ASSERT_TRUE(*ret_alloc3.m_ref_next_reserve_size == 10);
-      ASSERT_TRUE(ret_alloc3.m_ref_next_reserve_size == &my_alloc3.m_next_reserve_size);
-
-      custom_allocator<std::pair<const int, int>, 5, 10> my_alloc4(6, 11);
-      custom_allocator<std::pair<const int, int>> ret_alloc4(my_alloc4);
-      ASSERT_TRUE(ret_alloc4.m_init_reserve_size == 6);
-      ASSERT_TRUE(ret_alloc4.m_next_reserve_size == 1);
-      ASSERT_TRUE(*ret_alloc4.m_ref_next_reserve_size == 11);
-      ASSERT_TRUE(ret_alloc4.m_ref_next_reserve_size == &my_alloc4.m_next_reserve_size);
+      roro_lib::custom_allocator<std::pair<const int, int>, 2, 2> my_alloc3(5, 10);
+      ASSERT_TRUE(my_alloc3.init_reserve_size == 5);
+      ASSERT_TRUE(my_alloc3.next_reserve_size == 10);
+      ASSERT_TRUE(my_alloc3.ref_next_reserve_size == &my_alloc3.next_reserve_size);
 }
 
-TEST_F(CustomAllocatorTest, allocate_deallocate)
+TEST_F(roro_lib::custom_allocator_test, CopyCtor)
+{
+      roro_lib::custom_allocator<std::pair<const int, int>> my_alloc1;
+      roro_lib::custom_allocator<std::pair<const int, int>> ret_alloc1(my_alloc1);
+      ASSERT_TRUE(ret_alloc1.init_reserve_size == 1);
+      ASSERT_TRUE(ret_alloc1.next_reserve_size == 1);
+      ASSERT_TRUE(*ret_alloc1.ref_next_reserve_size == 1);
+      ASSERT_TRUE(ret_alloc1.ref_next_reserve_size == &my_alloc1.next_reserve_size);
+
+      roro_lib::custom_allocator<std::pair<const int, int>, 5> my_alloc2;
+      roro_lib::custom_allocator<std::pair<const int, int>> ret_alloc2(my_alloc2);
+      ASSERT_TRUE(ret_alloc2.init_reserve_size == 5);
+      ASSERT_TRUE(ret_alloc2.next_reserve_size == 1);
+      ASSERT_TRUE(*ret_alloc2.ref_next_reserve_size == 1);
+      ASSERT_TRUE(ret_alloc2.ref_next_reserve_size == &my_alloc2.next_reserve_size);
+
+      roro_lib::custom_allocator<std::pair<const int, int>, 5, 10> my_alloc3;
+      roro_lib::custom_allocator<std::pair<const int, int>> ret_alloc3(my_alloc3);
+      ASSERT_TRUE(ret_alloc3.init_reserve_size == 5);
+      ASSERT_TRUE(ret_alloc3.next_reserve_size == 1);
+      ASSERT_TRUE(*ret_alloc3.ref_next_reserve_size == 10);
+      ASSERT_TRUE(ret_alloc3.ref_next_reserve_size == &my_alloc3.next_reserve_size);
+
+      roro_lib::custom_allocator<std::pair<const int, int>, 5, 10> my_alloc4(6, 11);
+      roro_lib::custom_allocator<std::pair<const int, int>> ret_alloc4(my_alloc4);
+      ASSERT_TRUE(ret_alloc4.init_reserve_size == 6);
+      ASSERT_TRUE(ret_alloc4.next_reserve_size == 1);
+      ASSERT_TRUE(*ret_alloc4.ref_next_reserve_size == 11);
+      ASSERT_TRUE(ret_alloc4.ref_next_reserve_size == &my_alloc4.next_reserve_size);
+}
+
+TEST_F(roro_lib::custom_allocator_test, allocate_deallocate)
 {
       {
-            custom_allocator<std::pair<const int, int>> my_alloc;
+            roro_lib::custom_allocator<std::pair<const int, int>> my_alloc;
             ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr = my_alloc.allocate(1);
@@ -109,7 +112,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
       }
 
       {
-            custom_allocator<std::pair<const int, int>, 0, 2> my_alloc;
+            roro_lib::custom_allocator<std::pair<const int, int>, 0, 2> my_alloc;
             ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
@@ -130,7 +133,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
       }
 
       {
-            custom_allocator<std::pair<const int, int>, 2, 0> my_alloc;
+            roro_lib::custom_allocator<std::pair<const int, int>, 2, 0> my_alloc;
             ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
@@ -155,7 +158,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
       }
 
       {
-            custom_allocator<std::pair<const int, int>, 1, 1> my_alloc;
+            roro_lib::custom_allocator<std::pair<const int, int>, 1, 1> my_alloc;
             ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr = my_alloc.allocate(1);
@@ -170,7 +173,7 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
       }
 
       {
-            custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
+            roro_lib::custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
             ASSERT_TRUE(my_alloc.chunks == nullptr);
 
             std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
@@ -241,12 +244,12 @@ TEST_F(CustomAllocatorTest, allocate_deallocate)
       }
 }
 
-TEST_F(CustomAllocatorTest, next_reserve)
+TEST_F(roro_lib::custom_allocator_test, next_reserve)
 {
-      custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
+      roro_lib::custom_allocator<std::pair<const int, int>, 2, 2> my_alloc;
       ASSERT_TRUE(my_alloc.chunks == nullptr);
-      ASSERT_TRUE(my_alloc.m_init_reserve_size == 2);
-      ASSERT_TRUE(my_alloc.m_next_reserve_size == 2);
+      ASSERT_TRUE(my_alloc.init_reserve_size == 2);
+      ASSERT_TRUE(my_alloc.next_reserve_size == 2);
 
 
       std::pair<const int, int>* ptr1 = my_alloc.allocate(1);
@@ -265,8 +268,8 @@ TEST_F(CustomAllocatorTest, next_reserve)
 
       my_alloc.next_reserve(4);
       ASSERT_TRUE(my_alloc.chunks != nullptr);
-      ASSERT_TRUE(my_alloc.m_init_reserve_size == 2);
-      ASSERT_TRUE(my_alloc.m_next_reserve_size == 4);
+      ASSERT_TRUE(my_alloc.init_reserve_size == 2);
+      ASSERT_TRUE(my_alloc.next_reserve_size == 4);
 
       std::pair<const int, int>* ptr5 = my_alloc.allocate(1);
       ASSERT_TRUE(my_alloc.chunks != nullptr);
@@ -284,12 +287,12 @@ TEST_F(CustomAllocatorTest, next_reserve)
       ASSERT_TRUE(my_alloc.chunks->size() == 0);
 }
 
-TEST_F(CustomAllocatorTest, custom_forward_list1)
+TEST(custom_forward_list, test1)
 {
       std::vector<int> expected = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 
 
-      custom_forward_list<int, custom_allocator<int, 10>> list_my_allocator;
+      roro_lib::custom_forward_list<int, roro_lib::custom_allocator<int, 10>> list_my_allocator;
       for (int i = 0; i < 14; ++i)
       {
             list_my_allocator.push_front(i);
@@ -304,13 +307,13 @@ TEST_F(CustomAllocatorTest, custom_forward_list1)
       }
 }
 
-TEST_F(CustomAllocatorTest, custom_forward_list2)
+TEST(custom_forward_list, test2)
 {
       std::vector<int> expected = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 
-      custom_allocator<int> my_al(10, 5);
+      roro_lib::custom_allocator<int> my_al(10, 5);
 
-      custom_forward_list<int, custom_allocator<int>> list_my_allocator(my_al);
+      roro_lib::custom_forward_list<int, roro_lib::custom_allocator<int>> list_my_allocator(my_al);
       for (int i = 0; i < 14; ++i)
       {
             list_my_allocator.push_front(i);
@@ -325,13 +328,13 @@ TEST_F(CustomAllocatorTest, custom_forward_list2)
       }
 }
 
-TEST_F(CustomAllocatorTest, custom_forward_list3)
+TEST(custom_forward_list, test3)
 {
       std::vector<int> expected = { 8, 7, 6, 5, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0 };
 
-      custom_allocator<int> my_al(5, 2);
+      roro_lib::custom_allocator<int> my_al(5, 2);
 
-      custom_forward_list<int, custom_allocator<int>> list_my_allocator(my_al);
+      roro_lib::custom_forward_list<int, roro_lib::custom_allocator<int>> list_my_allocator(my_al);
       for (int i = 0; i < 5; ++i)
       {
             list_my_allocator.push_front(i);

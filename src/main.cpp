@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace boost::multiprecision;
+using namespace roro_lib;
 
 void help()
 {
@@ -101,9 +102,9 @@ int main(int argc, char* argv[])
 
       if (PCL.Option['m'])
       {
-            size_t SizeParam = PCL.Option['m'].ParamOption[0].size();
-            const char* const ptrStr = PCL.Option['m'].ParamOption[0].data();
-            from_chars(ptrStr, ptrStr + SizeParam, max_item);
+            const size_t size_param = PCL.Option['m'].ParamOption[0].size();
+            const char* const ptr_str = PCL.Option['m'].ParamOption[0].data();
+            from_chars(ptr_str, ptr_str + size_param, max_item);
       }
 
       if (PCL.Option['m'])

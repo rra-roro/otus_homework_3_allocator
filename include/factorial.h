@@ -3,7 +3,7 @@
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 
-int my_factorial(int i)
+constexpr int my_factorial(int i) noexcept
 {
       int ret = 1;
       for (int j = 1; j <= i; j++)
