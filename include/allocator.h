@@ -11,7 +11,6 @@ namespace roro_lib
       template <typename T, size_t initial_reservation = 1, size_t next_reservation = 1>
       struct custom_allocator
       {
-            template <typename T>
             class memory_chunk
             {
               public:
@@ -95,7 +94,7 @@ namespace roro_lib
 
             template <typename U, size_t initial_reservation_, size_t next_reservation_>
             custom_allocator(const custom_allocator<U, initial_reservation_, next_reservation_>& arg_alloc) noexcept : init_reserve_size(arg_alloc.init_reserve_size),
-                                                                                                                       ref_next_reserve_size(arg_alloc.ref_next_reserve_size){};
+                                                                                                                       ref_next_reserve_size(arg_alloc.ref_next_reserve_size){}
 
             template <typename U>
             struct rebind
@@ -126,7 +125,7 @@ namespace roro_lib
             {
                   if (chunks == nullptr)
                   {
-                        chunks = std::make_shared<std::list<memory_chunk<T>>>();
+                        chunks = std::make_shared<std::list<memory_chunk>>();
                   }
 
                   if (!chunks->empty() && chunks->back().is_free_memory())
@@ -191,7 +190,7 @@ namespace roro_lib
             friend struct custom_allocator;
 
         private:
-            std::shared_ptr<std::list<memory_chunk<T>>> chunks = nullptr;
+            std::shared_ptr<std::list<memory_chunk>> chunks = nullptr;
 
             std::size_t init_reserve_size = (initial_reservation == 0) ? 1 : initial_reservation;
 
@@ -211,12 +210,12 @@ namespace roro_lib
       constexpr bool operator==(const custom_allocator<T, reserve_tt>&, const custom_allocator<U, reserve_tu>&) noexcept
       {
             return true;
-      };
+      }
 
       template <typename T, std::size_t reserve_tt, typename U, std::size_t reserve_tu>
       constexpr bool operator!=(const custom_allocator<T, reserve_tt>&, const custom_allocator<U, reserve_tu>&) noexcept
       {
             return false;
-      };
+      }
 
 }

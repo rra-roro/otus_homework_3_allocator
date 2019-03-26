@@ -8,28 +8,28 @@ namespace roro_lib
       template <typename T, typename TAlloc = std::allocator<T>>
       class custom_forward_list
       {
-            template <typename T>
+            template <typename K>
             struct node
             {
-                  node(const T& arg) : obj(arg){};
-                  T obj;
+                  node(const K& arg) : obj(arg){};
+                  K obj;
                   node* next = nullptr;
             };
 
-            template <typename T>
+            template <typename M>
             class node_iter
             {
-                  node<T>* current_node;
+                  node<M>* current_node;
 
               public:
                   using iterator_category = std::forward_iterator_tag;
-                  using value_type = T;
+                  using value_type = M;
                   using difference_type = ptrdiff_t;
-                  using pointer = T*;
+                  using pointer = M*;
                   using reference = T&;
 
                   node_iter() noexcept : current_node(nullptr) {}
-                  node_iter(node<T>* node) noexcept : current_node(node) {}
+                  node_iter(node<M>* node) noexcept : current_node(node) {}
                   template <typename U>
                   node_iter(const node_iter<U>& iter) noexcept : current_node(iter.current_node) {}
 
