@@ -8,9 +8,10 @@ namespace roro_lib
       template <typename T, typename TAlloc = std::allocator<T>>
       class custom_forward_list
       {
-        public:
             template <typename M> class node_iter;
             template <typename K> struct node;
+
+        public:
             using value_type = T;
             using allocator_type = TAlloc;
             using size_type = size_t;
