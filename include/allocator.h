@@ -179,8 +179,9 @@ namespace roro_lib
 
               private:
                   std::unique_ptr<T[]> ptr_start_chunk;
-                  size_t size_buffer;
                   T* ptr_next_item_mem;
+
+                  size_t size_buffer;
                   size_t size_free_memory;
                   size_t count_use_chunk;
 
