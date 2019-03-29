@@ -79,44 +79,58 @@ int main(int argc, char* argv[])
 {
       int max_item = 10;
 
-      ParserCommandLine PCL;
-      PCL.AddFormatOfArg("?", no_argument, '?');
-      PCL.AddFormatOfArg("help", no_argument, '?');
-      PCL.AddFormatOfArg("version", no_argument, 'v');
-      PCL.AddFormatOfArg("max_item", required_argument, 'm');
-
-
-      PCL.SetShowError(false);
-      PCL.Parser(argc, argv);
-
-      if (PCL.Option['?'])
+      try
       {
-            help();
-            return 0;
-      }
-      if (PCL.Option['v'])
-      {
-            version_ip_filter();
-            return 0;
-      }
+            ParserCommandLine PCL;
+            PCL.AddFormatOfArg("?", no_argument, '?');
+            PCL.AddFormatOfArg("help", no_argument, '?');
+            PCL.AddFormatOfArg("version", no_argument, 'v');
+            PCL.AddFormatOfArg("max_item", required_argument, 'm');
 
-      if (PCL.Option['m'])
-      {
-            const size_t size_param = PCL.Option['m'].ParamOption[0].size();
-            const char* const ptr_str = PCL.Option['m'].ParamOption[0].data();
-            from_chars(ptr_str, ptr_str + size_param, max_item);
-      }
 
-      if (PCL.Option['m'])
-      {
-            task_map<mpz_int>(max_item);
-      }
-      else
-      {
-            task_map<int>(max_item);
-      }
+            PCL.SetShowError(false);
+            PCL.Parser(argc, argv);
 
-      task_custom_forward_list(max_item);
+            if (PCL.Option['?'])
+            {
+                  help();
+                  return 0;
+            }
+            if (PCL.Option['v'])
+            {
+                  version_ip_filter();
+                  return 0;
+            }
+
+            if (PCL.Option['m'])
+            {
+                  const size_t size_param = PCL.Option['m'].ParamOption[0].size();
+                  const char* const ptr_str = PCL.Option['m'].ParamOption[0].data();
+                  from_chars(ptr_str, ptr_str + size_param, max_item);
+            }
+
+            if (PCL.Option['m'])
+            {
+                  task_map<mpz_int>(max_item);
+            }
+            else
+            {
+                  task_map<int>(max_item);
+            }
+
+            task_custom_forward_list(max_item);
+
+      }
+      catch (const std::exception& ex)
+      {
+            cerr << "Error: " << ex.what() << endl;
+            return EXIT_FAILURE;
+      }
+      catch (...)
+      {
+            cerr << "Error: unknown exception" << endl;
+            return EXIT_FAILURE;
+      }
 
       return 0;
 }

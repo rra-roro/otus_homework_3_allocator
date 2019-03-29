@@ -8,6 +8,69 @@ namespace roro_lib
       template <typename T, typename TAlloc = std::allocator<T>>
       class custom_forward_list
       {
+        public:
+            template <typename M> class node_iter;
+            template <typename K> struct node;
+            using value_type = T;
+            using allocator_type = TAlloc;
+            using size_type = size_t;
+            using difference_type = std::ptrdiff_t;
+            using reference = T&;
+            using const_reference = const T&;
+            using pointer = typename std::allocator_traits<TAlloc>::pointer;
+            using const_pointer = typename std::allocator_traits<TAlloc>::const_pointer;
+            using iterator = node_iter<T>;
+            using const_iterator = node_iter<const T>;
+
+            custom_forward_list() noexcept : nodealloc() {}
+            custom_forward_list(const TAlloc& Al) noexcept : nodealloc(Al) {}
+
+            ~custom_forward_list() noexcept(false)
+            {
+                  while (ptr_begin != ptr_end)
+                  {
+                        node<T>* next = ptr_begin->next;
+                        std::allocator_traits<TNodeAlloc>::destroy(nodealloc, ptr_begin);
+                        std::allocator_traits<TNodeAlloc>::deallocate(nodealloc, ptr_begin, 1);
+                        ptr_begin = next;
+                  }
+            }
+
+            void push_front(const T& arg)
+            {
+                  node<T>* ptr_curent = std::allocator_traits<TNodeAlloc>::allocate(nodealloc, 1);
+                  std::allocator_traits<TNodeAlloc>::construct(nodealloc, ptr_curent, arg);
+                  ptr_curent->next = ptr_begin;
+                  ptr_begin = ptr_curent;
+            }
+
+            iterator begin() noexcept
+            {
+                  return iterator(ptr_begin);
+            }
+
+            iterator end() noexcept
+            {
+                  return iterator(ptr_end);
+            }
+
+            const_iterator cbegin() noexcept
+            {
+                  return const_iterator(ptr_begin);
+            }
+
+            const_iterator cend() noexcept
+            {
+                  return const_iterator(ptr_end);
+            }
+
+        private:
+            using TNodeAlloc = typename std::allocator_traits<TAlloc>::template rebind_alloc<node<T>>;
+            TNodeAlloc nodealloc;
+
+            node<T>* ptr_begin = nullptr;
+            node<T>* ptr_end = nullptr;
+
             template <typename K>
             struct node
             {
@@ -81,67 +144,5 @@ namespace roro_lib
                         return old_iter;
                   }
             };
-
-
-            using value_type = T;
-            using allocator_type = TAlloc;
-            using size_type = size_t;
-            using difference_type = std::ptrdiff_t;
-            using reference = T&;
-            using const_reference = const T&;
-            using pointer = typename std::allocator_traits<TAlloc>::pointer;
-            using const_pointer = typename std::allocator_traits<TAlloc>::const_pointer;
-            using iterator = node_iter<T>;
-            using const_iterator = node_iter<const T>;
-
-        private:
-            using TNodeAlloc = typename std::allocator_traits<TAlloc>::template rebind_alloc<node<T>>;
-            TNodeAlloc nodealloc;
-
-            node<T>* ptr_begin = nullptr;
-            node<T>* ptr_end = nullptr;
-
-        public:
-            custom_forward_list() noexcept : nodealloc() {}
-            custom_forward_list(const TAlloc& Al) noexcept : nodealloc(Al) {}
-
-            ~custom_forward_list() noexcept(false)
-            {
-                  while (ptr_begin != ptr_end)
-                  {
-                        node<T>* next = ptr_begin->next;
-                        std::allocator_traits<TNodeAlloc>::destroy(nodealloc, ptr_begin);
-                        std::allocator_traits<TNodeAlloc>::deallocate(nodealloc, ptr_begin, 1);
-                        ptr_begin = next;
-                  }
-            }
-
-            void push_front(const T& arg)
-            {
-                  node<T>* ptr_curent = std::allocator_traits<TNodeAlloc>::allocate(nodealloc, 1);
-                  std::allocator_traits<TNodeAlloc>::construct(nodealloc, ptr_curent, arg);
-                  ptr_curent->next = ptr_begin;
-                  ptr_begin = ptr_curent;
-            }
-
-            iterator begin() noexcept
-            {
-                  return iterator(ptr_begin);
-            }
-
-            iterator end() noexcept
-            {
-                  return iterator(ptr_end);
-            }
-
-            const_iterator cbegin() noexcept
-            {
-                  return const_iterator(ptr_begin);
-            }
-
-            const_iterator cend() noexcept
-            {
-                  return const_iterator(ptr_end);
-            }
       };
 }

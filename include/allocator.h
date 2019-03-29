@@ -11,80 +11,6 @@ namespace roro_lib
       template <typename T, size_t initial_reservation = 1, size_t next_reservation = 1>
       struct custom_allocator
       {
-            class memory_chunk
-            {
-              public:
-                  memory_chunk(size_t count_items) : size_buffer(count_items),
-                                                     size_free_memory(count_items),
-                                                     count_use_chunk(0)
-                  {
-                        ptr_start_chunk.reset(static_cast<T*>(::operator new[](count_items * sizeof(T))));
-                        ptr_next_item_mem = ptr_start_chunk.get();
-                  };
-
-                  bool contains(T* ptr) const noexcept
-                  {
-                        assert(ptr_next_item_mem != nullptr);
-                        return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
-                  }
-
-                  T* allocate_from(size_t n) noexcept
-                  {
-                        assert(ptr_next_item_mem != nullptr);
-                        assert((count_use_chunk + n) <= size_buffer);
-                        assert(size_free_memory >= n);
-
-                        count_use_chunk += n;
-                        size_free_memory -= n;
-
-                        T* ptr_current_item = ptr_next_item_mem;
-                        ptr_next_item_mem += n;
-
-                        return ptr_current_item;
-                  }
-
-                  void deallocate_from(size_t n) noexcept
-                  {
-                        assert((count_use_chunk - n) < count_use_chunk);
-                        count_use_chunk -= n;
-                  }
-
-                  size_t get_size_free_memory() const noexcept
-                  {
-                        return size_free_memory;
-                  }
-
-                  bool is_free_memory() const noexcept
-                  {
-                        return (size_free_memory != 0);
-                  }
-
-                  bool is_used() const noexcept
-                  {
-                        return (count_use_chunk != 0);
-                  }
-
-              private:
-                  using deleter_t = void (*)(T*);
-
-                  std::unique_ptr<T, deleter_t> ptr_start_chunk = { nullptr,
-                        [](T* p) { ::operator delete[](p); } };
-                  size_t size_buffer;
-                  T* ptr_next_item_mem;
-                  size_t size_free_memory;
-                  size_t count_use_chunk;
-
-                  size_t get_size_usedbuffer() const noexcept
-                  {
-                        return size_buffer - size_free_memory;
-                  }
-
-#ifdef _TEST
-                  FRIEND_TEST(custom_allocator_test, allocate_deallocate);
-                  FRIEND_TEST(custom_allocator_test, next_reserve);
-#endif
-            };
-
             using value_type = T;
 
             custom_allocator() noexcept = default;
@@ -190,12 +116,85 @@ namespace roro_lib
             friend struct custom_allocator;
 
         private:
+            class memory_chunk;
             std::shared_ptr<std::list<memory_chunk>> chunks = nullptr;
 
             std::size_t init_reserve_size = (initial_reservation == 0) ? 1 : initial_reservation;
 
             std::size_t next_reserve_size = (next_reservation == 0) ? 1 : next_reservation;
             std::size_t* ref_next_reserve_size = &next_reserve_size;
+
+            class memory_chunk
+            {
+              public:
+                  memory_chunk(size_t count_items) : ptr_start_chunk(static_cast<T*>(::operator new[](count_items * sizeof(T)))),
+                                                     ptr_next_item_mem(ptr_start_chunk.get()),
+                                                     size_buffer(count_items),
+                                                     size_free_memory(count_items),
+                                                     count_use_chunk(0)
+                  {
+                  };
+
+                  bool contains(T* ptr) const noexcept
+                  {
+                        assert(ptr_next_item_mem != nullptr);
+                        return (ptr >= ptr_start_chunk.get() && ptr < ptr_next_item_mem);
+                  }
+
+                  T* allocate_from(size_t n) noexcept
+                  {
+                        assert(ptr_next_item_mem != nullptr);
+                        assert((count_use_chunk + n) <= size_buffer);
+                        assert(size_free_memory >= n);
+
+                        count_use_chunk += n;
+                        size_free_memory -= n;
+
+                        T* ptr_current_item = ptr_next_item_mem;
+                        ptr_next_item_mem += n;
+
+                        return ptr_current_item;
+                  }
+
+                  void deallocate_from(size_t n) noexcept
+                  {
+                        assert((count_use_chunk - n) < count_use_chunk);
+                        count_use_chunk -= n;
+                  }
+
+                  size_t get_size_free_memory() const noexcept
+                  {
+                        return size_free_memory;
+                  }
+
+                  bool is_free_memory() const noexcept
+                  {
+                        return (size_free_memory != 0);
+                  }
+
+                  bool is_used() const noexcept
+                  {
+                        return (count_use_chunk != 0);
+                  }
+
+              private:
+                  std::unique_ptr<T[]> ptr_start_chunk;
+                  size_t size_buffer;
+                  T* ptr_next_item_mem;
+                  size_t size_free_memory;
+                  size_t count_use_chunk;
+
+                  size_t get_size_usedbuffer() const noexcept
+                  {
+                        return size_buffer - size_free_memory;
+                  }
+
+#ifdef _TEST
+                  FRIEND_TEST(custom_allocator_test, allocate_deallocate);
+                  FRIEND_TEST(custom_allocator_test, next_reserve);
+#endif
+            };
+
 
 #ifdef _TEST
             FRIEND_TEST(custom_allocator_test, DefaultCtor);
