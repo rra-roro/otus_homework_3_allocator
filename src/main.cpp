@@ -25,7 +25,7 @@ void help()
 )" << endl;
 }
 
-void version_ip_filter()
+void version_allocator()
 {
       cout << "Version allocator: " << version() << endl;
 }
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
             }
             if (PCL.Option['v'])
             {
-                  version_ip_filter();
+                  version_allocator();
                   return 0;
             }
 
